@@ -1,0 +1,34 @@
+node {
+
+    withMaven(maven:'maven') {
+
+        stage('Checkout') {
+            git url: 'https://github.com/codegen/ ${projectName}.git', credentialsId: '', branch: 'master'
+        }
+
+        stage('Build') {
+            sh 'mvn clean install package'
+
+            def pom = readMavenPom file:'pom.xml'
+            print pom.version
+            env.version = pom.version
+        }
+
+        stage('Image') {
+            dir ('generated-project-server') {
+                def app = docker.build "localhost:5000/ ${projectName}:${env.version}"
+                app.push()
+            }
+        }
+
+        stage ('Run') {
+            docker.image("localhost:5000/ ${projectName}:${env.version}").run('-p 2222:2222 -h  ${projectName} --name  ${projectName} --link discovery')
+        }
+
+        stage ('Final') {
+            build job: ' ${projectName}-pipeline', wait: false
+        }      
+
+    }
+
+}

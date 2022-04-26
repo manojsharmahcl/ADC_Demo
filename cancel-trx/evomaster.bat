@@ -1,0 +1,1 @@
+java -jar evomaster.jar  --blackBox true --bbSwaggerUrl http://localhost:8086/v2/api-docs  --outputFolder=C:\\RnD\\Demo\\leave-microservice\\usermanagement-server\\.evosuite\\blackbox-tests --outputFormat JAVA_JUNIT_4 --maxTime 30s
